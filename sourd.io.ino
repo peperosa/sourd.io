@@ -107,6 +107,6 @@ void loop() {
   humidity->save(humidity_percentage);
 
   // wait 5 seconds (5000 milliseconds == 5 seconds)
-  delay(5000);
+  delay(10000);
 
 }
