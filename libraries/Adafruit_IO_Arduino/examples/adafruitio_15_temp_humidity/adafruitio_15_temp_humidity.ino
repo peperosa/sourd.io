@@ -20,35 +20,20 @@
 
 /************************ Example Starts Here *******************************/
 #include <Adafruit_Sensor.h>
-//#include <DHT.h>
-//#include <DHT_U.h>
+#include <DHT.h>
+#include <DHT_U.h>
 
 // pin connected to DH22 data line
-// #define DATA_PIN 2
+#define DATA_PIN 2
 
 // create DHT22 instance
-//DHT_Unified dht(DATA_PIN, DHT11);
+DHT_Unified dht(DATA_PIN, DHT22);
 
 // set up the 'temperature' and 'humidity' feeds
-AdafruitIO_Feed *temperature = io.feed("sourd-dot-io-dot-tC");
-AdafruitIO_Feed *temperatureF = io.feed("sourd-dot-io-dot-tF");
-AdafruitIO_Feed *humidity = io.feed("sourd-dot-io-dot-h");
-AdafruitIO_Feed *distance = io.feed("sourd-dot-io-dot-d");
-
-/*************************** Ultrasonic sensor *******************************/
-const int trigPin = 2;  //D4
-const int echoPin = 0;  //D3
-
-int Vo;
-float Vo_scal, logR2, R2, T, Tc;
-float c1 = 1.009249522e-03, c2 = 2.378405444e-04, c3 = 2.019202697e-07;
-long duration; 
-float distancecm;
+AdafruitIO_Feed *temperature = io.feed("temperature");
+AdafruitIO_Feed *humidity = io.feed("humidity");
 
 void setup() {
-
-  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
-  pinMode(echoPin, INPUT); // Sets the echoPin as an Input
 
   // start the serial connection
   Serial.begin(115200);
@@ -57,7 +42,7 @@ void setup() {
   while(! Serial);
 
   // initialize dht22
-  //dht.begin();
+  dht.begin();
 
   // connect to io.adafruit.com
   Serial.print("Connecting to Adafruit IO");
@@ -84,14 +69,9 @@ void loop() {
   io.run();
 
   sensors_event_t event;
-  // dht.temperature().getEvent(&event);
+  dht.temperature().getEvent(&event);
 
-  Vo = analogRead(THERMISTORPIN);
-  Vo_scal = Vo; //*(5.0/3.3); // or Vo if V_in and V_analogref are the same...
-  R2 =  SERIESRESISTOR/(1023.0/Vo_scal-1); 
-  logR2 = log(R2);
-  T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
-  float celsius = T - 273.15;
+  float celsius = event.temperature;
   float fahrenheit = (celsius * 1.8) + 32;
 
   Serial.print("celsius: ");
@@ -103,39 +83,18 @@ void loop() {
   Serial.println("F");
 
   // save fahrenheit (or celsius) to Adafruit IO
-  temperature->save(celsius);
-  temperatureF->save(fahrenheit);
-  //dht.humidity().getEvent(&event);
-  float humidity_percentage = 20; //event.relative_humidity;
-  
+  temperature->save(fahrenheit);
+
+  dht.humidity().getEvent(&event);
+
   Serial.print("humidity: ");
-  Serial.print(humidity_percentage);
+  Serial.print(event.relative_humidity);
   Serial.println("%");
 
   // save humidity to Adafruit IO
-  humidity->save(humidity_percentage);
-  
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  
-  // Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  
-  // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPin, HIGH);
-  
-  // Calculating the distance
-  distancecm = duration*0.034/2;
-  // Prints the distance on the Serial Monitor
-  Serial.print("Distance: ");
-  Serial.println(distancecm);
+  humidity->save(event.relative_humidity);
 
-  // save distance to Adafruit IO
-  distance->save(distancecm);
-  
   // wait 5 seconds (5000 milliseconds == 5 seconds)
-  delay(10000);
+  delay(5000);
 
 }
