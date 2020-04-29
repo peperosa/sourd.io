@@ -53,13 +53,13 @@ void setup() {
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
 
   // start the serial connection
-  Serial.begin(115200);
-
+  //Serial.begin(115200);
+  Serial.begin(74880); 
   // wait for serial monitor to open
   while(! Serial);
 
   // initialize dht22
-  //dht.begin();
+  dht.begin();
 
   // connect to io.adafruit.com
   Serial.print("Connecting to Adafruit IO");
@@ -85,7 +85,7 @@ void loop() {
   // io.adafruit.com, and processes any incoming data.
   io.run();
 
-  sensors_event_t event;
+  // sensors_event_t event;
   // dht.temperature().getEvent(&event);
   // dht.humidity().getEvent(&event);
   
@@ -96,6 +96,7 @@ void loop() {
 //  T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
 //  float celsius = T - 273.15;
 //  float fahrenheit = (celsius * 1.8) + 32;
+
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
   float humidity_percentage = dht.readHumidity();
@@ -104,6 +105,10 @@ void loop() {
   // Read temperature as Fahrenheit (isFahrenheit = true)
   float fahrenheit = dht.readTemperature(true);
 
+//  float humidity_percentage = 20; 
+//  float celsius = 10; 
+//  float fahrenheit = 30; 
+  
   Serial.print("celsius: ");
   Serial.print(celsius);
   Serial.println("C");
@@ -137,6 +142,11 @@ void loop() {
   
   // Reads the echoPin, returns the sound wave travel time in microseconds
   duration = pulseIn(echoPin, HIGH);
+
+  if (isnan(humidity_percentage) || isnan(celsius) || isnan(fahrenheit)) {
+    Serial.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
   
   // Calculating the distance
   distancecm = duration*0.034/2;
