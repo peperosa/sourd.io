@@ -24,7 +24,7 @@
 //#include <DHT_U.h>
 
 // pin connected to DH22 data line
-#define DATA_PIN 2
+#define DATA_PIN 4
 #define DHTTYPE DHT22
 
 // create DHT22 instance
@@ -53,8 +53,8 @@ void setup() {
   pinMode(echoPin, INPUT); // Sets the echoPin as an Input
 
   // start the serial connection
-  //Serial.begin(115200);
-  Serial.begin(74880); 
+  Serial.begin(115200);
+  //Serial.begin(74880); 
   // wait for serial monitor to open
   while(! Serial);
 
@@ -104,11 +104,13 @@ void loop() {
   float celsius = dht.readTemperature();
   // Read temperature as Fahrenheit (isFahrenheit = true)
   float fahrenheit = dht.readTemperature(true);
-
-//  float humidity_percentage = 20; 
-//  float celsius = 10; 
-//  float fahrenheit = 30; 
   
+  // save fahrenheit (or celsius) to Adafruit IO
+  temperature->save(celsius);
+  temperatureF->save(fahrenheit);
+  // save humidity to Adafruit IO
+  humidity->save(humidity_percentage);
+      
   Serial.print("celsius: ");
   Serial.print(celsius);
   Serial.println("C");
@@ -116,22 +118,11 @@ void loop() {
   Serial.print("fahrenheit: ");
   Serial.print(fahrenheit);
   Serial.println("F");
-
-  Serial.print("humidity: ");
-  Serial.print(humidity_percentage);
-  Serial.println("%");
-  
-  // save fahrenheit (or celsius) to Adafruit IO
-  temperature->save(celsius);
-  temperatureF->save(fahrenheit);
   
   Serial.print("humidity: ");
   Serial.print(humidity_percentage);
   Serial.println("%");
 
-  // save humidity to Adafruit IO
-  humidity->save(humidity_percentage);
-  
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
   
@@ -158,6 +149,6 @@ void loop() {
   distance->save(distancecm);
   
   // wait 5 seconds (5000 milliseconds == 5 seconds)
-  delay(10000);
+  delay(15000);
 
 }
