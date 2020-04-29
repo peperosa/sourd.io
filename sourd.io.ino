@@ -20,14 +20,16 @@
 
 /************************ Example Starts Here *******************************/
 #include <Adafruit_Sensor.h>
-//#include <DHT.h>
+#include <DHT.h>
 //#include <DHT_U.h>
 
 // pin connected to DH22 data line
-// #define DATA_PIN 2
+#define DATA_PIN 2
+#define DHTTYPE DHT22
 
 // create DHT22 instance
-//DHT_Unified dht(DATA_PIN, DHT11);
+// DHT_Unified dht(DATA_PIN, DHTTYPE);
+ DHT dht(DATA_PIN, DHTTYPE);
 
 // set up the 'temperature' and 'humidity' feeds
 AdafruitIO_Feed *temperature = io.feed("sourd-dot-io-dot-tC");
@@ -85,14 +87,22 @@ void loop() {
 
   sensors_event_t event;
   // dht.temperature().getEvent(&event);
-
-  Vo = analogRead(THERMISTORPIN);
-  Vo_scal = Vo; //*(5.0/3.3); // or Vo if V_in and V_analogref are the same...
-  R2 =  SERIESRESISTOR/(1023.0/Vo_scal-1); 
-  logR2 = log(R2);
-  T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
-  float celsius = T - 273.15;
-  float fahrenheit = (celsius * 1.8) + 32;
+  // dht.humidity().getEvent(&event);
+  
+//  Vo = analogRead(THERMISTORPIN);
+//  Vo_scal = Vo; //*(5.0/3.3); // or Vo if V_in and V_analogref are the same...
+//  R2 =  SERIESRESISTOR/(1023.0/Vo_scal-1); 
+//  logR2 = log(R2);
+//  T = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
+//  float celsius = T - 273.15;
+//  float fahrenheit = (celsius * 1.8) + 32;
+  // Reading temperature or humidity takes about 250 milliseconds!
+  // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+  float humidity_percentage = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+  float celsius = dht.readTemperature();
+  // Read temperature as Fahrenheit (isFahrenheit = true)
+  float fahrenheit = dht.readTemperature(true);
 
   Serial.print("celsius: ");
   Serial.print(celsius);
@@ -102,11 +112,13 @@ void loop() {
   Serial.print(fahrenheit);
   Serial.println("F");
 
+  Serial.print("humidity: ");
+  Serial.print(humidity_percentage);
+  Serial.println("%");
+  
   // save fahrenheit (or celsius) to Adafruit IO
   temperature->save(celsius);
   temperatureF->save(fahrenheit);
-  //dht.humidity().getEvent(&event);
-  float humidity_percentage = 20; //event.relative_humidity;
   
   Serial.print("humidity: ");
   Serial.print(humidity_percentage);
