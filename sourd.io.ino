@@ -79,6 +79,9 @@ void setup() {
 
 void loop() {
 
+    // wait 5 seconds (5000 milliseconds == 5 seconds)
+  delay(30000);
+
   // io.run(); is required for all sketches.
   // it should always be present at the top of your loop
   // function. it keeps the client connected to
@@ -148,7 +151,5 @@ void loop() {
   // save distance to Adafruit IO
   distance->save(distancecm);
   
-  // wait 5 seconds (5000 milliseconds == 5 seconds)
-  delay(15000);
 
 }
