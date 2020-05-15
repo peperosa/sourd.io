@@ -33,7 +33,6 @@
 
 // set up the 'temperature' and 'humidity' feeds
 AdafruitIO_Feed *temperature = io.feed("sourd-dot-io-dot-tC");
-AdafruitIO_Feed *temperatureF = io.feed("sourd-dot-io-dot-tF");
 AdafruitIO_Feed *humidity = io.feed("sourd-dot-io-dot-h");
 AdafruitIO_Feed *distance = io.feed("sourd-dot-io-dot-d");
 
@@ -110,7 +109,7 @@ void loop() {
   
   // save fahrenheit (or celsius) to Adafruit IO
   temperature->save(celsius);
-  temperatureF->save(fahrenheit);
+  // temperatureF->save(fahrenheit);
   // save humidity to Adafruit IO
   humidity->save(humidity_percentage);
       
